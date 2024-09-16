@@ -2,7 +2,7 @@
 
 ## Database Schema Design
 
-![alt text](image.png) 
+![alt text](image-1.png) 
 ![alt text](Untitled.png)
 
 ## API Documentation
@@ -50,8 +50,8 @@ Returns the information about the current user that is logged in.
 
 * Require Authentication: false
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `GET`
+  * Route path: `/users`
   * Body: none
 
 * Successful Response when there is a logged in user
@@ -91,8 +91,8 @@ information.
 
 * Require Authentication: false
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method:   `POST`
+  * Route path:    `/login`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -157,8 +157,8 @@ user's information.
 
 * Require Authentication: false
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `POST`
+  * Route path: `/signup`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -233,8 +233,8 @@ Returns all the spots.
 
 * Require Authentication: false
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `GET`
+  * Route path: `/spots`
   * Body: none
 
 * Successful Response
@@ -273,8 +273,8 @@ Returns all the spots owned (created) by the current user.
 
 * Require Authentication: true
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `GET`
+  * Route path: `/users/:ownerId/spots`
   * Body: none
 
 * Successful Response
@@ -313,8 +313,8 @@ Returns the details of a spot specified by its id.
 
 * Require Authentication: false
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `GET`
+  * Route path: `/spots/:id`
   * Body: none
 
 * Successful Response
@@ -378,8 +378,8 @@ Creates and returns a new spot.
 
 * Require Authentication: true
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `POST`
+  * Route path: `/spots/new`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -452,8 +452,8 @@ Create and return a new image for a spot specified by id.
 * Require Authentication: true
 * Require proper authorization: Spot must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `POST`
+  * Route path: `/spots/:spotid/images`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -498,8 +498,8 @@ Updates and returns an existing spot.
 * Require Authentication: true
 * Require proper authorization: Spot must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `PUT`
+  * Route path: `/spots/:spotid/edit`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -584,8 +584,8 @@ Deletes an existing spot.
 * Require Authentication: true
 * Require proper authorization: Spot must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `DELETE`
+  * Route path: `/spots/:spotid`
   * Body: none
 
 * Successful Response
@@ -620,8 +620,8 @@ Returns all the reviews written by the current user.
 
 * Require Authentication: true
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `GET`
+  * Route path: `/reviews/:userid/users`
   * Body: none
 
 * Successful Response
@@ -676,8 +676,8 @@ Returns all the reviews that belong to a spot specified by id.
 
 * Require Authentication: false
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `GET`
+  * Route path: `/reviews/:spotid/spots`
   * Body: none
 
 * Successful Response
@@ -731,8 +731,8 @@ Create and return a new review for a spot specified by id.
 
 * Require Authentication: true
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `POST`
+  * Route path: `/reviews/:spotid/post`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -809,8 +809,8 @@ Create and return a new image for a review specified by id.
 * Require Authentication: true
 * Require proper authorization: Review must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `POST`
+  * Route path: `/reviews/:reviewid/images`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -866,8 +866,8 @@ Update and return an existing review.
 * Require Authentication: true
 * Require proper authorization: Review must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `PUT`
+  * Route path: `/reviews/:reviewid/edit`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -932,8 +932,8 @@ Delete an existing review.
 * Require Authentication: true
 * Require proper authorization: Review must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `DELETE`
+  * Route path: `/reviews/:reviewid`
   * Body: none
 
 * Successful Response
@@ -968,8 +968,8 @@ Return all the bookings that the current user has made.
 
 * Require Authentication: true
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `GET`
+  * Route path: `/bookings/:userid`
   * Body: none
 
 * Successful Response
@@ -1013,8 +1013,8 @@ Return all the bookings for a spot specified by id.
 
 * Require Authentication: true
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `GET`
+  * Route path: `bookings/:spotid`
   * Body: none
 
 * Successful Response: If you ARE NOT the owner of the spot.
@@ -1081,8 +1081,8 @@ Create and return a new booking from a spot specified by id.
 * Require Authentication: true
 * Require proper authorization: Spot must NOT belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `PUT`
+  * Route path: `/spots/:spotid/bookings`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -1163,8 +1163,8 @@ Update and return an existing booking.
 * Require Authentication: true
 * Require proper authorization: Booking must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `PUT`
+  * Route path: `/bookings/:id`
   * Headers:
     * Content-Type: application/json
   * Body:
@@ -1258,8 +1258,8 @@ Delete an existing booking.
 * Require proper authorization: Booking must belong to the current user or the
   Spot must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `DELETE`
+  * Route path: `/bookings/:id`
   * Body: none
 
 * Successful Response
@@ -1307,8 +1307,8 @@ Delete an existing image for a Spot.
 * Require Authentication: true
 * Require proper authorization: Spot must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `DELETE`
+  * Route path: `/spots/images/:id`
   * Body: none
 
 * Successful Response
@@ -1342,8 +1342,8 @@ Delete an existing image for a Review.
 * Require Authentication: true
 * Require proper authorization: Review must belong to the current user
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `DELETE`
+  * Route path: `/review/images/:review_id` ( Does this delete the whole review? )
   * Body: none
 
 * Successful Response
@@ -1376,8 +1376,8 @@ Return spots filtered by query parameters.
 
 * Require Authentication: false
 * Request
-  * Method: ?
-  * Route path: ?
+  * Method: `GET`
+  * Route path: `/spots`
   * Query Parameters
     * page: integer, minimum: 1, default: 1
     * size: integer, minimum: 1, maximum: 20, default: 20
