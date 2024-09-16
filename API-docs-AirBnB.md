@@ -1,4 +1,4 @@
-# `<name of application here>`
+# `<name of application here>` (MarsBnB) / (JJKBnb)
 
 ## Database Schema Design
 
