@@ -201,7 +201,7 @@ fetch('/api/session', {
     "Content-Type": "application/json",
     "XSRF-TOKEN": `<value of XSRF-TOKEN cookie>`
   },
-  body: JSON.stringify({ credential: 'Demo-lition', password: 'password' })
+  body: JSON.stringify({ credential: 'Demo-lition', password: 'demolizer' })
 }).then(res => res.json()).then(data => console.log(data));
 ```
 
@@ -219,7 +219,7 @@ fetch('/api/session', {
     "Content-Type": "application/json",
     "XSRF-TOKEN": `<value of XSRF-TOKEN cookie>`
   },
-  body: JSON.stringify({ credential: 'demo@user.io', password: 'password' })
+  body: JSON.stringify({ credential: 'demo@user.io', password: 'demolizer' })
 }).then(res => res.json()).then(data => console.log(data));
 ```
 
