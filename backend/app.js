@@ -13,7 +13,6 @@ const app = express();
 
 const routes = require('./routes');
 
-app.use(routes); // Connect all the routes
 
 app.use(morgan('dev')); 
 
@@ -45,7 +44,7 @@ if (!isProduction) {
   ); 
 
 
-
+  app.use(routes); // Connect all the routes
 
 
 
