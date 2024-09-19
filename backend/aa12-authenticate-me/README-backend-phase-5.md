@@ -514,3 +514,36 @@ In the next part, you will deploy the application to Render.
 [http://localhost:8000/api/require-auth]: http://localhost:8000/api/require-auth
 [http://localhost:8000/api/session]: http://localhost:8000/api/session
 [http://localhost:8000/api/csrf/restore]: http://localhost:8000/api/csrf/restore
+
+
+# Our Doing 
+
+## Testing the above endpoints
+
+```js
+fetch('/api/session', {
+  method: 'POST',
+  headers: {
+    "Content-Type": "application/json",
+    "XSRF-TOKEN": "qwVZtWTn-o_1Q7IGhW7zZEqfxfTgN8JBpcsQ"
+  },
+  body: JSON.stringify({
+    firstName: "Narc",
+    lastName: "Yepot",
+    email: 'dfire@user.io',
+    username: 'firefighter',
+    password: 'extinguisher'
+  })
+}).then(res => res.json()).then(data => console.log(data));
+``` 
+
+
+```js
+fetch('/api/session', {
+  method: 'GET',
+  headers: {
+    "Content-Type": "application/json",
+    "XSRF-TOKEN": "qwVZtWTn-o_1Q7IGhW7zZEqfxfTgN8JBpcsQ"
+  }
+}).then(res => res.json()).then(data => console.log(data));
+```
