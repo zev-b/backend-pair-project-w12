@@ -83,7 +83,7 @@ module.exports = {
         description: "Saturated bamboo and polinated Lilies, towels provided",
         price: 199.50,
       }
-    ]);
+    ], { validate: true });
   },
 
   async down (queryInterface, Sequelize) {
