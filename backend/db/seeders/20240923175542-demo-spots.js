@@ -5,7 +5,7 @@ const { Spot } = require('../models');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const demoSpots = [
+    await Spot.bulkCreate([
       {
         ownerId: 1,
         address: "123 Sesame Street",
@@ -78,15 +78,11 @@ module.exports = {
         description: "Saturated bamboo and polinated Lilies, towels provided",
         price: 199.50,
       }
-    ];
-
-    for (const spot of demoSpots) {
-      await Spot.create(spot);
-    } 
+    ]);
   },
 
   async down (queryInterface, Sequelize) {
     
-    await queryInterface.bulkDelete('Spots', null, {});
+     return await queryInterface.bulkDelete('Spots', null, {});
   }
 };
