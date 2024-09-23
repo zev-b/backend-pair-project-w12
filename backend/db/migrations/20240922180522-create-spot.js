@@ -1,6 +1,6 @@
 'use strict';
 
-const user = require('../models/user');
+const { User } = require('../models/user');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -16,7 +16,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Users",
+          model: "User",
           key: "id",
         },
         onDelete: 'CASCADE',
