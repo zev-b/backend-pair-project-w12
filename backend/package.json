@@ -11,7 +11,7 @@
     "start:production": "node ./bin/www",
     "build": "node psql-setup-script.js",
 
-    "data": "sqlite3 db/dev.db \".mode box\" `select * from ${$TBL};`",
+    "data": "sqlite3 db/dev.db \".mode box\" \"select * from $TBL;\"",
     "d": "rm db/dev.db",
     "m": "npx dotenv sequelize db:migrate",
     "s": "npx dotenv sequelize db:seed:all",
