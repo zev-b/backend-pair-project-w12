@@ -36,9 +36,9 @@ module.exports = {
         url: '../assets/pew-pew.png',
         preview: true,
       }, 
-    ],  { validate: true })
+    ])
   },
-
+  // ,  { validate: true }
   async down (queryInterface, Sequelize) {
     options.tableName = 'SpotImages';
     const Op = Sequelize.Op;
