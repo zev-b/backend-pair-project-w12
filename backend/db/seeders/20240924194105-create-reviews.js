@@ -35,6 +35,12 @@ module.exports = {
         review: "Beautiful art, only heard one pew though.",
         stars: 2,
       },
+      {
+        spotId: 4,
+        userId: 1,
+        review: "Felt right at home, very cozy.",
+        stars: 4,
+      },
 
     ], { validate: true })
 

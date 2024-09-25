@@ -6,17 +6,42 @@ const { Spot, SpotImage, Review, ReviewImage, User } = require('../../db/models'
 
 
 router.get('/', async (req, res) => {
-    const allSpots = await Spot.findAll(); 
+    const allSpots = await Spot.findAll({
+        include: [
+            {
+                model: Review,
+                attributes: ['stars'],
+            },
+            {
+                model: SpotImage,
+                where: {
+                    preview: true,
+                },
+                attributes: ['url'],
+            },
+        ]
+    }); 
+
+    allSpots.forEach((spot) => {
+        reviewStars = spot.Reviews.map((review) => review.stars);
+        if (reviewStars.length) {
+            spot.avgRating = reviewStars.reduce((sum, star) => sum + star, 0) / reviewStars.length;
+        } else {
+            spot.avgRating = null;
+        }
+
+        spot.dataValues.avgRatings = spot.avgRating;
+        spot.dataValues.previewImage = spot.SpotImages[0].url; 
+
+        delete spot.Reviews;
+        delete spot.SpotImages;
+    })
     console.log(allSpots, `<===`);
     //! Is there a need to loop and ammend avgRating and preview imge to end of each individual spot obj ? TBD
-    return res.status(200).json({
-        allSpots,
-        //! avgRating,
-        //! previewImg
-    });
+    return res.status(200).json({ Spots: allSpots });
 }); 
 
-router.get('/api/spots/current', restoreUser, requireAuth, async (req, res) => {
+router.get('/current', restoreUser, requireAuth, async (req, res) => {
     const currentUserId = req.user.id;
 
     const currentSpots = await Spot.findAll({
@@ -33,7 +58,7 @@ router.get('/api/spots/current', restoreUser, requireAuth, async (req, res) => {
 
 }); 
 
-router.get('/api/spots/:spotId', async (req, res) => {
+router.get('/:spotId', async (req, res) => {
     const spotById = await Spot.findByPk(req.params.spotId); 
 
     if (!spotById) {
@@ -50,7 +75,7 @@ router.get('/api/spots/:spotId', async (req, res) => {
 
 });
 
-router.post('/api/spots', restoreUser, requireAuth, async (req, res) => {
+router.post('/', restoreUser, requireAuth, async (req, res) => {
     try {
         const { address, city, state, country, lat, lng, name, description, price } = req.body; 
 
@@ -86,7 +111,7 @@ router.post('/api/spots', restoreUser, requireAuth, async (req, res) => {
     } 
 })   
 
-router.post('/api/spots/:spotId/images', restoreUser, requireAuth, async (req, res) => { 
+router.post('/:spotId/images', restoreUser, requireAuth, async (req, res) => { 
     const { url, preview } = req.body;
 
     const spotById = await Spot.findByPk(req.params.spotId); 
@@ -110,7 +135,7 @@ router.post('/api/spots/:spotId/images', restoreUser, requireAuth, async (req, r
     res.status(201).json(newImage);
 })
 
-router.put('/api/spots/:spotId/', restoreUser, requireAuth, async (req, res) => {
+router.put('/:spotId', restoreUser, requireAuth, async (req, res) => {
     try {
         const { address, city, state, country, lat, lng, name, description, price } = req.body; 
         
@@ -160,7 +185,7 @@ router.put('/api/spots/:spotId/', restoreUser, requireAuth, async (req, res) => 
     
 }) 
 
-router.delete('/api/spots/:spotId', restoreUser, requireAuth, async (req, res) => { 
+router.delete('/:spotId', restoreUser, requireAuth, async (req, res) => { 
     const spotById = await Spot.findByPk(req.params.spotId);
 
     if (!spotById) {
@@ -177,12 +202,6 @@ router.delete('/api/spots/:spotId', restoreUser, requireAuth, async (req, res) =
 
     return res.status(200).json({ message: " Successfully deleted" });
 })
-
-
-
-
-
-
 
 
 
