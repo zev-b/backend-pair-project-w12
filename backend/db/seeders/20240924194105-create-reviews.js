@@ -36,7 +36,7 @@ module.exports = {
         stars: 2,
       },
 
-    ],  { validate: true })
+    ], { validate: true })
 
 
 

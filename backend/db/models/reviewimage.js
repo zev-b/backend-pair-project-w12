@@ -1,7 +1,8 @@
 'use strict';
 const {
-  Model
-} = require('sequelize');
+  Model, Validator
+} = require('sequelize'); 
+
 module.exports = (sequelize, DataTypes) => {
   class ReviewImage extends Model {
     /**
@@ -38,9 +39,30 @@ module.exports = (sequelize, DataTypes) => {
     url: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        isUrl: true
-      }
+      // validate: {
+      //   isLocalOrUrl(value) {
+      //     const localRegexTest = /^\.\/|\.\.\/|\/[^\/]*$/; 
+
+      //     const urlRegexTest = /^(\/\w+\/\w+\/\w+|(?:[a-zA-Z]{1,10}:\/\/)?(?:www\.)?(?:[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})+(?:\/[^\s]*)?(\.(?:jpg|jpeg|png|webp|avif|gif|svg|bmp|ico|tiff))?)$/;
+
+      //     // if (localRegexTest.test(value)) {
+      //     //   return;
+      //     // } 
+      //     // if (Validator.isUrl(value)) {
+      //     //   return;
+      //     // }  
+      //     // console.log(value, `<=== value`);
+           
+
+      //     if (urlRegexTest.test(value)) {
+      //       throw new Error('URL must be a local path or valid URL.');
+      //     } else {
+      //       return;
+      //     }
+
+      //     // throw new Error('URL must be a local path or valid URL.');
+      //   }
+      // }
     },
   }, {
     sequelize,

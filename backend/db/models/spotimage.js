@@ -1,7 +1,8 @@
 'use strict';
 const {
-  Model
-} = require('sequelize');
+  Model, Validator
+} = require('sequelize'); 
+
 module.exports = (sequelize, DataTypes) => {
   class SpotImage extends Model {
 
@@ -33,9 +34,17 @@ module.exports = (sequelize, DataTypes) => {
     url: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        isUrl: true,
-      },
+      // validate: {
+      //   isLocalOrUrl(value) {
+      //     const localRegexTest = /^\.\/|\.\.\/|\/[^\/]*$/; 
+
+      //     if (localRegexTest.test(value)) {
+      //       return;
+      //     } 
+
+      //     throw new Error('URL must be a local path or valid URL.')
+      //   }
+      // },
     },
     preview: DataTypes.BOOLEAN,
     createdAt: DataTypes.DATE,
