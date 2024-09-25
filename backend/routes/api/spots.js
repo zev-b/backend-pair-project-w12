@@ -6,39 +6,78 @@ const { Spot, SpotImage, Review, ReviewImage, User } = require('../../db/models'
 
 
 router.get('/', async (req, res) => {
-    const allSpots = await Spot.findAll({
-        include: [
-            {
-                model: Review,
-                attributes: ['stars'],
-            },
-            {
-                model: SpotImage,
-                where: {
-                    preview: true,
-                },
-                attributes: ['url'],
-            },
-        ]
-    }); 
+    // const allSpots = await Spot.findAll({
+    //     include: [
+    //         {
+    //             model: Review,
+    //             attributes: ['stars'],
+    //         },
+    //         {
+    //             model: SpotImage,
+    //             where: {
+    //                 preview: true,
+    //             },
+    //             attributes: ['url'],
+    //         },
+    //     ]
+    // }); 
 
-    allSpots.forEach((spot) => {
-        reviewStars = spot.Reviews.map((review) => review.stars);
-        if (reviewStars.length) {
-            spot.avgRating = reviewStars.reduce((sum, star) => sum + star, 0) / reviewStars.length;
-        } else {
-            spot.avgRating = null;
-        }
+    // allSpots.forEach((spot) => {
+    //     reviewStars = spot.Reviews.map((review) => review.stars);
+    //     if (reviewStars.length) {
+    //         spot.avgRating = reviewStars.reduce((sum, star) => sum + star, 0) / reviewStars.length;
+    //     } else {
+    //         spot.avgRating = null;
+    //     }
 
-        spot.dataValues.avgRatings = spot.avgRating;
-        spot.dataValues.previewImage = spot.SpotImages[0].url; 
+    //     spot.dataValues.avgRatings = spot.avgRating;
+    //     spot.dataValues.previewImage = spot.SpotImages[0]?.url || 'no url'; 
 
-        delete spot.Reviews;
-        delete spot.SpotImages;
-    })
-    console.log(allSpots, `<===`);
-    //! Is there a need to loop and ammend avgRating and preview imge to end of each individual spot obj ? TBD
-    return res.status(200).json({ Spots: allSpots });
+    //     delete spot.Reviews;
+    //     delete spot.SpotImages;
+    // })
+    // console.log(allSpots, `<===`);
+    // //! Is there a need to loop and ammend avgRating and preview imge to end of each individual spot obj ? TBD
+    // return res.status(200).json({ Spots: allSpots }); 
+
+    
+        const spots = await Spot.findAll({
+            include: [{ model: SpotImage }, { model: Review }],
+        });
+    
+        // Mutate Spots object to add Avg Rating, previewImage
+        let Spots = [];
+        spots.forEach((spot) => {
+            Spots.push(spot.toJSON());
+        });
+    
+        Spots.forEach((spot) => {
+            // Grab all reviews
+            if (spot.Reviews.length) {
+                let count = 0;
+                // Iterate through reviews to find star count
+                spot.Reviews.forEach((review) => {
+                    count += review.stars;
+                });
+                spot.avgRating = count / spot.Reviews.length;
+            } else {
+                spot.avgRating = 0;
+            }
+            if (spot.SpotImages.length) {
+                spot.SpotImages.forEach((image) => {
+                    if (image.preview === true) {
+                        spot.previewImage = image.url;
+                    }
+                });
+            } else {
+                spot.previewImage = "no preview url";
+            }
+            delete spot.SpotImages;
+            delete spot.Reviews;
+        });
+    
+        res.json({ Spots });
+    
 }); 
 
 router.get('/current', restoreUser, requireAuth, async (req, res) => {
