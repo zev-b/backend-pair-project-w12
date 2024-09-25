@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router(); 
 const { Op } = require('sequelize'); 
-const { restoreUser, requireAuth } = require('../../utils/auth.js');
+const { restoreUser, requireAuth } = require('../../utils/auth.js'); 
+const { Spot, SpotImage, Review, ReviewImage, User } = require('../../db/models')
 
 
-router.get('/api/spots', async (req, res) => {
+router.get('/', async (req, res) => {
     const allSpots = await Spot.findAll(); 
-
+    console.log(allSpots, `<===`);
     //! Is there a need to loop and ammend avgRating and preview imge to end of each individual spot obj ? TBD
     return res.status(200).json({
         allSpots,
@@ -83,7 +84,7 @@ router.post('/api/spots', restoreUser, requireAuth, async (req, res) => {
             }
           })
     } 
-}) 
+})   
 
 router.post('/api/spots/:spotId/images', restoreUser, requireAuth, async (req, res) => { 
     const { url, preview } = req.body;
