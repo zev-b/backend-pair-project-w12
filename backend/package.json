@@ -16,7 +16,8 @@
     "m": "npx dotenv sequelize db:migrate",
     "s": "npx dotenv sequelize db:seed:all",
     "dm": "npm run d && npm run m",
-    "dms": "npm run dm && npm run s"
+    "dms": "npm run dm && npm run s",
+    "rb": "npx dotenv sequelize-cli db:seed:undo:all && npx dotenv sequelize-cli db:migrate:undo:all "
   },
   "keywords": [],
   "author": "",
