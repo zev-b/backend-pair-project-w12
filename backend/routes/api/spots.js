@@ -27,13 +27,18 @@ function calcAvg(reviews) {
     }
 };
 
+// function getPreviewImg(images) {
+//     if (images.length > 0) {
+//         return images[0].url;       //^<============ convert to grab where preview is TRUE (See below func)
+//     } else {
+//         return null;
+//     }
+// }; 
+
 function getPreviewImg(images) {
-    if (images.length > 0) {
-        return images[0].url;
-    } else {
-        return null;
-    }
-};
+    const previewImage = images.find(image => image.preview === true);
+    return previewImage ? previewImage.url : null;
+}
 
 
 router.get('/', async (req, res) => {
