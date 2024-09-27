@@ -4,13 +4,18 @@ const { Op, ValidationError  } = require('sequelize');
 const { restoreUser, requireAuth } = require('../../utils/auth.js'); 
 const { Spot, SpotImage, Review, ReviewImage, User, Booking } = require('../../db/models');
 
+// function getPreviewImg(images) {
+//     if (images.length > 0) {
+//         return images[0].url;
+//     } else {
+//         return null;
+//     }
+// };
+
 function getPreviewImg(images) {
-    if (images.length > 0) {
-        return images[0].url;
-    } else {
-        return null;
-    }
-};
+    const previewImage = images.find(image => image.preview === true);
+    return previewImage ? previewImage.url : null;
+}
 
 router.get('/current', requireAuth, async (req, res) => {
     const curUser = req.user.id;
