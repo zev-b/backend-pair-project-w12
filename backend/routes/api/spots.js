@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router(); 
-const { Op, ValidationError  } = require('sequelize'); 
+const { Op, ValidationError } = require('sequelize'); 
 const { restoreUser, requireAuth } = require('../../utils/auth.js'); 
 const { Spot, SpotImage, Review, ReviewImage, User } = require('../../db/models');
 
@@ -80,79 +80,7 @@ router.get('/', async (req, res) => {
 
     return res.status(200).json({ Spots: spotDeets });
 }); 
-                //^     ===== ALT METHOD ======
-// router.get('/', async (req, res) => {
-    // const allSpots = await Spot.findAll({
-    //     include: [
-    //         {
-    //             model: Review,
-    //             attributes: ['stars'],
-    //         },
-    //         {
-    //             model: SpotImage,
-    //             where: {
-    //                 preview: true,
-    //             },
-    //             attributes: ['url'],
-    //         },
-    //     ]
-    // }); 
 
-    // allSpots.forEach((spot) => {
-    //     reviewStars = spot.Reviews.map((review) => review.stars);
-    //     if (reviewStars.length) {
-    //         spot.avgRating = reviewStars.reduce((sum, star) => sum + star, 0) / reviewStars.length;
-    //     } else {
-    //         spot.avgRating = null;
-    //     }
-
-    //     spot.dataValues.avgRatings = spot.avgRating;
-    //     spot.dataValues.previewImage = spot.SpotImages[0]?.url || 'no url'; 
-
-    //     delete spot.Reviews;
-    //     delete spot.SpotImages;
-    // })
-    // console.log(allSpots, `<===`);
-    // //! Is there a need to loop and ammend avgRating and preview imge to end of each individual spot obj ? TBD
-    // return res.status(200).json({ Spots: allSpots }); 
-    //^     ===== ALT METHOD ======
-//         const spots = await Spot.findAll({
-//             include: [{ model: SpotImage }, { model: Review }],
-//         });
-//         // Mutate Spots object to add Avg Rating, previewImage
-//         let Spots = [];
-//         spots.forEach((spot) => {
-//             Spots.push(spot.toJSON());
-//         });
-    
-//         Spots.forEach((spot) => {
-//             // Grab all reviews
-//             if (spot.Reviews.length) {
-//                 let count = 0;
-//                 // Iterate through reviews to find star count
-//                 spot.Reviews.forEach((review) => {
-//                     count += review.stars;
-//                 });
-//                 spot.avgRating = count / spot.Reviews.length;
-//             } else {
-//                 spot.avgRating = 0;
-//             }
-//             if (spot.SpotImages.length) {
-//                 spot.SpotImages.forEach((image) => {
-//                     if (image.preview === true) {
-//                         spot.previewImage = image.url;
-//                     }
-//                 });
-//             } else {
-//                 spot.previewImage = "no preview url";
-//             }
-//             delete spot.SpotImages;
-//             delete spot.Reviews;
-//         });
-    
-//         res.json({ Spots });
-    
-// }); 
 
 router.get('/current', restoreUser, requireAuth, async (req, res) => {
     const currentUserId = req.user.id;
@@ -202,7 +130,6 @@ router.get('/current', restoreUser, requireAuth, async (req, res) => {
 }); 
 
 router.get('/:spotId', async (req, res) => {
-      //await Spot.findByPk(req.params.spotId);
     
      const spotById = await Spot.findOne({
         where: {
@@ -266,12 +193,12 @@ router.post('/', restoreUser, requireAuth, async (req, res) => {
     // try {
         const { address, city, state, country, lat, lng, name, description, price } = req.body; 
 
-        const validationErrors = {};
+        const validationErrors = {}; // or []
 
-        // if (!address) validationErrors.address = 'Street address is required';
-        // if (!city) validationErrors.city = 'City is required';
-        // if (!state) validationErrors.state = 'State is required';
-        // if (!country) validationErrors.country = 'Country is required';
+        // if (!address) validationErrors.push('Street address is required');
+        // if (!city) validationErrors.push('City is required');
+        // if (!state) validationErrors..push('State is required');
+        // if (!country) validationErrors.push('Country is required');
         // if (!lat || lat > 90 || lat < -90) validationErrors.push('Latitude must be within -90 and 90');
         // if (!lng || lng > 180 || lng < -180) validationErrors.push('Longitude must be within -180 and 180');
         // if (!name || name.length > 50) validationErrors.push('Name must be less than 50 characters');
@@ -288,10 +215,14 @@ router.post('/', restoreUser, requireAuth, async (req, res) => {
         if (!description) validationErrors.description = 'Description is required';
         if (!price || price < 1) validationErrors.price = 'Price per day must be a positive number';
 
-        if (validationErrors.length) {
-            // throw new ValidationError('Validation error', validationErrors);
-            return res.status(400).json({ message: 'Validation error', errors: validationErrors });
+        // if (validationErrors.length) {
+        //     // throw new ValidationError('Validation error', validationErrors);
+        //     return res.status(400).json({ message: 'Validation error', errors: validationErrors });
+        // }
 
+        if (Object.keys(validationErrors).length) {
+            const message = 'Bad Request'; 
+            return res.status(400).json({ message, errors: validationErrors });
         }
 
         const newSpot = await Spot.create({
@@ -348,23 +279,38 @@ router.post('/:spotId/images', restoreUser, requireAuth, async (req, res) => {
 })
 
 router.put('/:spotId', restoreUser, requireAuth, async (req, res) => {
-    try {
+    // try {
         const { address, city, state, country, lat, lng, name, description, price } = req.body; 
         
-        const validationErrors = []; 
+        const validationErrors = {}; 
 
-        if (!address) validationErrors.push('Street address is required');
-        if (!city) validationErrors.push('City is required');
-        if (!state) validationErrors.push('State is required');
-        if (!country) validationErrors.push('Country is required');
-        if (!lat || lat > 90 || lat < -90) validationErrors.push('Latitude must be within -90 and 90');
-        if (!lng || lng > 180 || lng < -180) validationErrors.push('Longitude must be within -180 and 180');
-        if (!name || name.length > 50) validationErrors.push('Name must be less than 50 characters');
-        if (!description) validationErrors.push('Description is required');
-        if (!price || price < 1) validationErrors.push('Price per day must be a positive number');
+        // if (!address) validationErrors.push('Street address is required');
+        // if (!city) validationErrors.push('City is required');
+        // if (!state) validationErrors.push('State is required');
+        // if (!country) validationErrors.push('Country is required');
+        // if (!lat || lat > 90 || lat < -90) validationErrors.push('Latitude must be within -90 and 90');
+        // if (!lng || lng > 180 || lng < -180) validationErrors.push('Longitude must be within -180 and 180');
+        // if (!name || name.length > 50) validationErrors.push('Name must be less than 50 characters');
+        // if (!description) validationErrors.push('Description is required');
+        // if (!price || price < 1) validationErrors.push('Price per day must be a positive number'); 
 
-        if (validationErrors.length) {
-            throw new ValidationError('Validation error', validationErrors);
+        if (!address) validationErrors.address = 'Street address is required';
+        if (!city) validationErrors.city = 'City is required';
+        if (!state) validationErrors.state = 'State is required';
+        if (!country) validationErrors.country = 'Country is required';
+        if (!lat || lat > 90 || lat < -90) validationErrors.lat = 'Latitude must be within -90 and 90';
+        if (!lng || lng > 180 || lng < -180) validationErrors.lng = 'Longitude must be within -180 and 180';
+        if (!name || name.length > 50) validationErrors.name = 'Name must be less than 50 characters';
+        if (!description) validationErrors.description = 'Description is required';
+        if (!price || price < 1) validationErrors.price = 'Price per day must be a positive number';
+
+        // if (validationErrors.length) {
+        //     throw new ValidationError('Validation error', validationErrors);
+        // }
+
+        if (Object.keys(validationErrors).length) {
+            const message = 'Bad request'; 
+            return res.status(400).json({ message, errors: validationErrors });
         }
 
         let spotById = await Spot.findByPk(req.params.spotId); 
@@ -392,13 +338,13 @@ router.put('/:spotId', restoreUser, requireAuth, async (req, res) => {
     }); 
 
     res.status(200).json(spotById); 
-    } catch (e) {
-        if (e instanceof ValidationError) {
-            return res.status(400).json({ message: 'Validation error', errors: e.errors });
-        } else {
-            return res.status(500).json({ message: 'Server error' });
-        }
-    } 
+    // } catch (e) {
+    //     if (e instanceof ValidationError) {
+    //         return res.status(400).json({ message: 'Validation error', errors: e.errors });
+    //     } else {
+    //         return res.status(500).json({ message: 'Server error' });
+    //     }
+    // } 
     
 }) 
 
