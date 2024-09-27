@@ -405,21 +405,26 @@ router.get('/:spotId/reviews', async (req, res) => {
 });
 
 router.post('/:spotId/reviews', restoreUser, requireAuth, async (req, res) => {
-    try {
+    // try {
         const { review, stars } = req.body;
         const { spotId } = req.params;
 
-        const validationErrors = [];
+        const validationErrors = {};
 
         if (!review) {
-            validationErrors.push('Review text is required');
+            validationErrors.review = 'Review text is required';
         }
         if (!stars || isNaN(stars) || stars < 1 || stars > 5) {
-            validationErrors.push('Stars must be an integer from 1 to 5');
+            validationErrors.stars = 'Stars must be an integer from 1 to 5';
         }
 
-        if (validationErrors.length) {
-            throw new ValidationError('Validation error', validationErrors);
+        // if (validationErrors.length) {
+        //     throw new ValidationError('Validation error', validationErrors);
+        // } 
+
+        if (Object.keys(validationErrors).length) {
+            const message = 'Bad Request'; 
+            return res.status(400).json({ message, errors: validationErrors });
         }
 
         const spotExists = await Spot.findByPk(spotId);
@@ -449,13 +454,13 @@ router.post('/:spotId/reviews', restoreUser, requireAuth, async (req, res) => {
         });
 
         res.status(201).json(newReview);
-    } catch (e) {
-        if (e instanceof ValidationError) {
-            return res.status(400).json({ message: 'Validation error', errors: e.errors });
-        } else {
-            return res.status(500).json({ message: 'Server error' });
-        }
-    }
+    // } catch (e) {
+    //     if (e instanceof ValidationError) {
+    //         return res.status(400).json({ message: 'Validation error', errors: e.errors });
+    //     } else {
+    //         return res.status(500).json({ message: 'Server error' });
+    //     }
+    // }
     
 });
 

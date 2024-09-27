@@ -154,22 +154,27 @@ router.post('/:reviewId/images', restoreUser, requireAuth, async (req, res) => {
 });
 
 router.put('/:reviewId', restoreUser, requireAuth, async (req, res) => { 
-    try {
+    // try {
         const { reviewId } = req.params;
         const { review, stars } = req.body;
 
-        const validationErrors = [];
+        const validationErrors = {};
 
         if (!review) {
-            validationErrors.push('Review text is required');
+            validationErrors.review = 'Review text is required';
         }
 
         if (!stars || isNaN(stars) || stars < 1 || stars > 5) {
-            validationErrors.push('Stars must be an integer from 1 to 5');
+            validationErrors.stars = 'Stars must be an integer from 1 to 5';
         }
 
-        if (validationErrors.length) {
-            throw new ValidationError('Validation error', validationErrors);
+        // if (validationErrors.length) {
+        //     throw new ValidationError('Validation error', validationErrors);
+        // } 
+
+        if (Object.keys(validationErrors).length) {
+            const message = 'Bad Request'; 
+            return res.status(400).json({ message, errors: validationErrors });
         }
 
         const reviewToUpdate = await Review.findByPk(reviewId);
@@ -188,14 +193,14 @@ router.put('/:reviewId', restoreUser, requireAuth, async (req, res) => {
         await reviewToUpdate.save();
 
         res.status(200).json(reviewToUpdate);
-    } catch (error) {
-        console.error(error);
-        if (error instanceof ValidationError) {
-          return res.status(400).json({ message: 'Validation error', errors: error.errors });
-        } else {
-          return res.status(500).json({ message: 'Internal Server Error' });
-        }
-    }
+    // } catch (error) {
+    //     console.error(error);
+    //     if (error instanceof ValidationError) {
+    //       return res.status(400).json({ message: 'Validation error', errors: error.errors });
+    //     } else {
+    //       return res.status(500).json({ message: 'Internal Server Error' });
+    //     }
+    // }
     
 });
 
