@@ -74,7 +74,7 @@ router.get('/', async (req, res) => {
             createdAt: spot.createdAt,
             updatedAt: spot.updatedAt,
             avgRating: avgRating,
-            previewImg: previewImg
+            previewImage: previewImg
         };
     });
 
@@ -193,7 +193,7 @@ router.get('/current', restoreUser, requireAuth, async (req, res) => {
             createdAt: spot.createdAt,
             updatedAt: spot.updatedAt,
             avgRating: avgRating,
-            previewImg: previewImg
+            previewImage: previewImg
         };
     });
 
@@ -258,28 +258,40 @@ router.get('/:spotId', async (req, res) => {
             }
         };
 
-    return res.status(200).json({ Spots: spotDeets });
+    return res.status(200).json(spotDeets);
 
 });
 
 router.post('/', restoreUser, requireAuth, async (req, res) => {
-    try {
+    // try {
         const { address, city, state, country, lat, lng, name, description, price } = req.body; 
 
-        const validationErrors = [];
+        const validationErrors = {};
 
-        if (!address) validationErrors.push('Street address is required');
-        if (!city) validationErrors.push('City is required');
-        if (!state) validationErrors.push('State is required');
-        if (!country) validationErrors.push('Country is required');
-        if (!lat || lat > 90 || lat < -90) validationErrors.push('Latitude must be within -90 and 90');
-        if (!lng || lng > 180 || lng < -180) validationErrors.push('Longitude must be within -180 and 180');
-        if (!name || name.length > 50) validationErrors.push('Name must be less than 50 characters');
-        if (!description) validationErrors.push('Description is required');
-        if (!price || price < 1) validationErrors.push('Price per day must be a positive number');
+        // if (!address) validationErrors.address = 'Street address is required';
+        // if (!city) validationErrors.city = 'City is required';
+        // if (!state) validationErrors.state = 'State is required';
+        // if (!country) validationErrors.country = 'Country is required';
+        // if (!lat || lat > 90 || lat < -90) validationErrors.push('Latitude must be within -90 and 90');
+        // if (!lng || lng > 180 || lng < -180) validationErrors.push('Longitude must be within -180 and 180');
+        // if (!name || name.length > 50) validationErrors.push('Name must be less than 50 characters');
+        // if (!description) validationErrors.push('Description is required');
+        // if (!price || price < 1) validationErrors.push('Price per day must be a positive number');
+
+        if (!address) validationErrors.address = 'Street address is required';
+        if (!city) validationErrors.city = 'City is required';
+        if (!state) validationErrors.state = 'State is required';
+        if (!country) validationErrors.country = 'Country is required';
+        if (!lat || lat > 90 || lat < -90) validationErrors.lat = 'Latitude must be within -90 and 90';
+        if (!lng || lng > 180 || lng < -180) validationErrors.lng = 'Longitude must be within -180 and 180';
+        if (!name || name.length > 50) validationErrors.name = 'Name must be less than 50 characters';
+        if (!description) validationErrors.description = 'Description is required';
+        if (!price || price < 1) validationErrors.price = 'Price per day must be a positive number';
 
         if (validationErrors.length) {
-            throw new ValidationError('Validation error', validationErrors);
+            // throw new ValidationError('Validation error', validationErrors);
+            return res.status(400).json({ message: 'Validation error', errors: validationErrors });
+
         }
 
         const newSpot = await Spot.create({
@@ -287,7 +299,7 @@ router.post('/', restoreUser, requireAuth, async (req, res) => {
             address, 
             city, 
             state, 
-            country, 
+            country,
             lat, 
             lng, 
             name, 
@@ -296,13 +308,13 @@ router.post('/', restoreUser, requireAuth, async (req, res) => {
     }); 
 
     res.status(201).json(newSpot); 
-    } catch (e) {
-        if (e instanceof ValidationError) {
-            return res.status(400).json({message: 'Validation error', errors: e.errors});
-        } else {
-            return res.status(500).json({message: 'Server error'});
-        }
-    } 
+    // } catch (e) {
+    //     if (e instanceof ValidationError) {
+    //         return res.status(400).json({message: 'Validation error', errors: e.errors});
+    //     } else {
+    //         return res.status(500).json({message: 'Server error'});
+    //     }
+    // } 
 })   
 
 router.post('/:spotId/images', restoreUser, requireAuth, async (req, res) => { 
