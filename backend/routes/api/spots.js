@@ -382,9 +382,9 @@ router.put('/:spotId', restoreUser, requireAuth, async (req, res) => {
     res.status(200).json(spotById); 
     } catch (e) {
         if (e instanceof ValidationError) {
-            return res.status(400).json({message: 'Validation error', errors: e.errors});
+            return res.status(400).json({ message: 'Validation error', errors: e.errors });
         } else {
-            return res.status(500).json({message: 'Server error'});
+            return res.status(500).json({ message: 'Server error' });
         }
     } 
     
@@ -409,6 +409,96 @@ router.delete('/:spotId', restoreUser, requireAuth, async (req, res) => {
 })
 
 
+router.get('/:spotId/reviews', async (req, res) => {
+    const { spotId } = req.params;
+  
+    try {
+      const reviews = await Review.findAll({
+        where: {
+          spotId,
+        },
+        include: [
+          {
+            model: User,
+            attributes: ['id', 'firstName', 'lastName'],
+          },
+          {
+            model: ReviewImage,
+            as: 'ReviewImages',
+            attributes: ['id', 'url'],
+          },
+        ],
+      });
+  
+      if (!reviews.length) {
+        return res.status(404).json({ message: 'No reviews found for this spot' });
+      }
+  
+      const reviewsWithImages = reviews.map((review) => {
+        const jsonReview = review.toJSON();
+        return jsonReview;
+      });
+  
+      res.status(200).json({ Reviews: reviewsWithImages });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
+router.post('/:spotId/reviews', restoreUser, requireAuth, async (req, res) => {
+    try {
+        const { review, stars } = req.body;
+        const { spotId } = req.params;
+
+        const validationErrors = [];
+
+        if (!review) {
+            validationErrors.push('Review text is required');
+        }
+        if (!stars || isNaN(stars) || stars < 1 || stars > 5) {
+            validationErrors.push('Stars must be an integer from 1 to 5');
+        }
+
+        if (validationErrors.length) {
+            throw new ValidationError('Validation error', validationErrors);
+        }
+
+        const spotExists = await Spot.findByPk(spotId);
+
+        if (!spotExists) {
+            return res.status(404).json({ message: "Spot couldn't be found" });
+        }
+
+        const priorReview = await Review.findOne({
+            where: {
+                spotId,
+                userId: req.user.id,
+            },
+        }); 
+
+        if (priorReview) {
+            return res.status(500).json({
+                message: 'User already has a review for this spot',
+            })
+        } 
+
+        const newReview = await Review.create({
+            userId: req.user.id,
+            spotId,
+            review,
+            stars,
+        });
+
+        res.status(201).json(newReview);
+    } catch (e) {
+        if (e instanceof ValidationError) {
+            return res.status(400).json({ message: 'Validation error', errors: e.errors });
+        } else {
+            return res.status(500).json({ message: 'Server error' });
+        }
+    }
+    
+});
 
 module.exports = router;
