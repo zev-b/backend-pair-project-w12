@@ -12,27 +12,27 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await SpotImage.bulkCreate([
       {
-        spotid: 1,
+        spotId: 1,
         url: '../assets/wing-chair.png',
         preview: true,
       }, 
       {
-        spotid: 1,
+        spotId: 1,
         url: '../assets/wing-chair2.png',
         preview: false,
       }, 
       {
-        spotid: 2,
+        spotId: 2,
         url: '../assets/bleachers.png',
         preview: true,
       }, 
       {
-        spotid: 3,
+        spotId: 3,
         url: '../assets/haunted-bench.png',
         preview: true,
       }, 
       {
-        spotid: 4, 
+        spotId: 4, 
         url: '../assets/pew-pew.png',
         preview: true,
       }, 

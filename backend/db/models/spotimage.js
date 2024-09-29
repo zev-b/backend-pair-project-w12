@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
 
     static associate(models) {
       SpotImage.belongsTo(models.Spot, {
-        foreignKey: 'spotid',
+        foreignKey: 'spotId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
   });
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       autoIncrement: true,
     },
-    spotid: {
+    spotId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {

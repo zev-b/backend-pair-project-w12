@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router(); 
 const { Op, ValidationError } = require('sequelize'); 
 const { restoreUser, requireAuth } = require('../../utils/auth.js'); 
-const { Spot, SpotImage, Review, ReviewImage, User } = require('../../db/models');
+const { Spot, SpotImage, Review, ReviewImage, User, Booking } = require('../../db/models');
+const { route } = require('./bookings.js');
+
+
 
 function calcReviews(reviews) {
     let count = 0;
@@ -365,7 +368,7 @@ router.delete('/:spotId', restoreUser, requireAuth, async (req, res) => {
 
     return res.status(200).json({ message: " Successfully deleted" });
 })
-
+ 
 
 router.get('/:spotId/reviews', async (req, res) => {
     const { spotId } = req.params;
@@ -397,7 +400,7 @@ router.get('/:spotId/reviews', async (req, res) => {
         return jsonReview;
       });
   
-      res.status(200).json({ Reviews: reviewsWithImages });
+      res.status(200).json({ Reviews: reviewsWithImages }); 
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal Server Error' });
@@ -463,5 +466,29 @@ router.post('/:spotId/reviews', restoreUser, requireAuth, async (req, res) => {
     // }
     
 });
+router.get('/:spotId/bookings', restoreUser, requireAuth, async (req,res) => {
+    const { spotId } = req.params;
+    const { userId } = req.user.id
+    const spotExists = await Spot.findByPk(spotId);
 
+    if (spotId === userId)
+
+    if (!spotExists) {
+        return res.status(404).json({message: "Spot couldn't be found"})
+    };
+    const booking = await Booking.findAll({
+        where: { spotId },
+        include: userId === spotExists.ownerId ? [{moserl :User, attributes: ['id', 'firstName', 'lastName']}] : []
+    });
+    if (userId === spotExists.ownerId) {
+        return res.status(200).json({Bookings: booking});
+    } else { 
+        const filteredBookings = booking.map(booking => ({
+            spotId: booking.spotId,
+            startDate: booking.startDate,
+            endDate: booking.endDate
+        }));
+        return res.status(200).json({Bookings: filteredBookings })
+    }
+} )
 module.exports = router;

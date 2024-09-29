@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Booking.belongsTo(models.Spot, {
-        foreignKey: 'spotid',
+        foreignKey: 'spotId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement:true,
       allowNull:false
     },
-    spotid: {
+    spotId: {
       type: DataTypes.INTEGER,
       allowNull:false,
       references: {

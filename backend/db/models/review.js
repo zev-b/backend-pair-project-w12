@@ -12,12 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Review.belongsTo(models.Spot, {
-        foreignKey: 'spotid',
+        foreignKey: 'spotId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
       Review.belongsTo(models.User, {
-        foreignKey: 'userid',
+        foreignKey: 'userId',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
