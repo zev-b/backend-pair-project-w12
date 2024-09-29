@@ -35,6 +35,7 @@ router.get('/current', requireAuth, async (req, res) => {
  
         ],
     });
+    
     const bookingDeets = curBookings.map ( booking => {
         const spot = booking.Spot;
         const previewImage = getPreviewImg(spot.SpotImages);
