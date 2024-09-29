@@ -154,7 +154,7 @@ router.post('/:reviewId/images', restoreUser, requireAuth, async (req, res) => {
 });
 
 router.put('/:reviewId', restoreUser, requireAuth, async (req, res) => { 
-    // try {
+
         const { reviewId } = req.params;
         const { review, stars } = req.body;
 
@@ -167,10 +167,6 @@ router.put('/:reviewId', restoreUser, requireAuth, async (req, res) => {
         if (!stars || isNaN(stars) || stars < 1 || stars > 5) {
             validationErrors.stars = 'Stars must be an integer from 1 to 5';
         }
-
-        // if (validationErrors.length) {
-        //     throw new ValidationError('Validation error', validationErrors);
-        // } 
 
         if (Object.keys(validationErrors).length) {
             const message = 'Bad Request'; 
@@ -193,15 +189,6 @@ router.put('/:reviewId', restoreUser, requireAuth, async (req, res) => {
         await reviewToUpdate.save();
 
         res.status(200).json(reviewToUpdate);
-    // } catch (error) {
-    //     console.error(error);
-    //     if (error instanceof ValidationError) {
-    //       return res.status(400).json({ message: 'Validation error', errors: error.errors });
-    //     } else {
-    //       return res.status(500).json({ message: 'Internal Server Error' });
-    //     }
-    // }
-    
 });
 
 router.delete('/:reviewId', restoreUser, requireAuth, async (req, res) => {
