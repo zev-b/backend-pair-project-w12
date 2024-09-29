@@ -47,12 +47,12 @@ module.exports = {
       lat: {
         type: Sequelize.DECIMAL,
         allowNull: false,
-        unique: true,
+        // unique: true,
       },
       lng: {
         type: Sequelize.DECIMAL,
         allowNull: false,
-        unique: true,
+        // unique: true,
       },
       name: {
         type: Sequelize.STRING,

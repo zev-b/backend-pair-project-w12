@@ -194,6 +194,8 @@ router.get('/:spotId', async (req, res) => {
 
 router.post('/', restoreUser, requireAuth, async (req, res) => {
     // try {
+        console.log('Received Cookies:', req.cookies);
+
         const { address, city, state, country, lat, lng, name, description, price } = req.body; 
 
         const validationErrors = {}; // or []
@@ -269,7 +271,7 @@ router.post('/:spotId/images', restoreUser, requireAuth, async (req, res) => {
     const newImage = await SpotImage.create({
         url: req.body.url,
         preview: req.body.preview,
-        spotid: spotById.id,
+        spotId: spotById.id,
     }); 
 
     const returnInfo = {
@@ -366,7 +368,7 @@ router.delete('/:spotId', restoreUser, requireAuth, async (req, res) => {
 
     await spotById.destroy();
 
-    return res.status(200).json({ message: " Successfully deleted" });
+    return res.status(200).json({ message: "Successfully deleted" });
 })
  
 
@@ -392,7 +394,7 @@ router.get('/:spotId/reviews', async (req, res) => {
       });
   
       if (!reviews.length) {
-        return res.status(404).json({ message: 'No reviews found for this spot' });
+        return res.status(404).json({ message: "Spot couldn't be found" });
       }
   
       const reviewsWithImages = reviews.map((review) => {

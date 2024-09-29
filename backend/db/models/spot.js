@@ -57,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     lat: {
       type: DataTypes.DECIMAL,
-      unique: true,
+      // unique: true,
       allowNull: false, 
       validate: {
         min: -90, 
@@ -66,8 +66,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     lng: {
       type: DataTypes.DECIMAL,
-      unique: true,
-      allowNull: false, 
+      // unique: true,
+      allowNull: false,
       validate: {
         min: -180, 
         max: 180,
@@ -94,6 +94,10 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Spot',
+    constraints: {
+      unique: true,
+      fields: ['lng', 'lat'],
+    },
   });
   return Spot;
 };

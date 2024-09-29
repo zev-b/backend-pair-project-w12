@@ -110,7 +110,7 @@ router.get('/current', restoreUser, requireAuth, async (req, res) => {
         const spotId = jsonReview.Spot.id; 
 
         const previewImageObj = await SpotImage.findOne({ where: { spotId } });
-        jsonReview.Spot.previewImage = previewImageObj.url;
+        jsonReview.Spot.previewImage = previewImageObj?.url ?? null;
         
         
         return jsonReview;
@@ -219,7 +219,7 @@ router.delete('/:reviewId', restoreUser, requireAuth, async (req, res) => {
 
     await reviewById.destroy();
 
-    return res.status(200).json({ message: " Successfully deleted" });
+    return res.status(200).json({ message: "Successfully deleted" });
 })
 
 
