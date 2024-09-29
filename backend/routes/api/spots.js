@@ -466,7 +466,7 @@ router.post('/:spotId/reviews', restoreUser, requireAuth, async (req, res) => {
     //         return res.status(500).json({ message: 'Server error' });
     //     }
     // }
-    
+
 });
 router.get('/:spotId/bookings', restoreUser, requireAuth, async (req,res) => {
     const { spotId } = req.params;
