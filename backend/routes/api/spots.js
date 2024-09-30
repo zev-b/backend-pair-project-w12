@@ -4,6 +4,7 @@ const { Op, ValidationError } = require('sequelize');
 const { restoreUser, requireAuth } = require('../../utils/auth.js'); 
 const { Spot, SpotImage, Review, ReviewImage, User, Booking } = require('../../db/models');
 const { route } = require('./bookings.js');
+const spot = require('../../db/models/spot.js');
 
 
 
@@ -14,7 +15,12 @@ function calcReviews(reviews) {
     }
     return count;
 }
-function calcAvg(reviews) {
+function calcAvg(reviews) { 
+
+    if (!reviews) { // Check if reviews is undefined or null
+        return 0; // Return 0 if no reviews
+      }
+
     const rating = reviews.map(review => review.stars); //! Extract the stars from EACH review
     let totalRating = 0; 
     // Calculate the total sum of the rating
@@ -31,29 +37,188 @@ function calcAvg(reviews) {
 };
 
 function getPreviewImg(images) {
+    if (!images) {
+        return null;
+    }
     const previewImage = images.find(image => image.preview === true);
     return previewImage ? previewImage.url : null;
 }
 
 
+// router.get('/', async (req, res) => {
+//     const allSpots = await Spot.findAll({
+//         include: [
+//             {
+//                 model: Review,
+//                 as: 'Reviews',
+//             },
+//             {
+//                 model: SpotImage,
+//                 as: 'SpotImages'
+//             },
+//         ]
+//     }); 
+//     const spotDeets = allSpots.map ( spot => {
+//         const avgRating = calcAvg(spot.Reviews);
+
+//         const previewImg = getPreviewImg(spot.SpotImages);
+
+//         return {
+//             id: spot.id,
+//             ownerId: spot.ownerId,
+//             address: spot.address,
+//             city: spot.city,
+//             state: spot.state,
+//             country: spot.country,
+//             lat: spot.lat,
+//             lng: spot.lng,
+//             name: spot.name,
+//             description: spot.description,
+//             price: spot.price,
+//             createdAt: spot.createdAt,
+//             updatedAt: spot.updatedAt,
+//             avgRating: avgRating,
+//             previewImage: previewImg
+//         };
+//     });
+
+//     return res.status(200).json({ Spots: spotDeets });
+// });   
+
+
 router.get('/', async (req, res) => {
-    const allSpots = await Spot.findAll({
+// try {
+    const validationErrors = {};
+    console.log(`\n=== REQ.QUERY ===\n`, req.query);
+
+
+    // validate page/size
+    if (req.query.page) {
+        if (!parseInt(req.query.page)) {
+            validationErrors.page = 'Page must be greater than or equal to 1';
+        }
+    }
+    if (req.query.size) {
+        if (!parseInt(req.query.size)) {
+            validationErrors.size = 'Size must be between 1 and 20';
+        }
+    }
+    if (req.query.page && (parseInt(req.query.page) < 1)) {
+      validationErrors.page = 'Page must be greater than or equal to 1';
+    }
+    if (req.query.size && (parseInt(req.query.size) < 1 || parseInt(req.query.size) > 20)) {
+      validationErrors.size = 'Size must be between 1 and 20';
+    }
+
+
+    // validate lat/lng 
+    if (req.query.minLat) {
+        if (!parseFloat(req.query.minLat)) {
+            validationErrors.minLat = 'Minimum latitude is invalid';
+        }
+    }
+    if (req.query.maxLat) {
+        if (!parseFloat(req.query.maxLat)) {
+            validationErrors.maxLat = 'Maximum latitude is invalid';
+        }
+    }
+    if (req.query.minLng) {
+        if (!parseFloat(req.query.minLng)) {
+            validationErrors.minLng = 'Minimum longitude is invalid';
+        }
+    }
+    if (req.query.maxLng) {
+        if (!parseFloat(req.query.maxLng)) {
+            validationErrors.maxLng = 'Maximum longitude is invalid';
+        }
+    }
+
+    if (req.query.minLat && (parseFloat(req.query.minLat) < -90 || parseFloat(req.query.minLat) > 90)) {
+      validationErrors.minLat = 'Minimum latitude is invalid';
+    }
+    if (req.query.maxLat && (parseFloat(req.query.maxLat) < -90 || parseFloat(req.query.maxLat) > 90)) {
+      validationErrors.maxLat = 'Maximum latitude is invalid';
+    }
+    if (req.query.minLng && (parseFloat(req.query.minLng) < -180 || parseFloat(req.query.minLng) > 180)) {
+      validationErrors.minLng = 'Minimum longitude is invalid';
+    }
+    if (req.query.maxLng && (parseFloat(req.query.maxLng) < -180 || parseFloat(req.query.maxLng) > 180)) {
+      validationErrors.maxLng = 'Maximum longitude is invalid';
+    }
+
+    // validate price
+    if (req.query.minPrice && parseFloat(req.query.minPrice) < 0) {
+      validationErrors.minPrice = 'Minimum price must be greater than or equal to 0';
+    }
+    if (req.query.maxPrice && parseFloat(req.query.maxPrice) < 0) {
+      validationErrors.maxPrice = 'Maximum price must be greater than or equal to 0';
+    }
+
+    console.log(`\n==== Errors ====\n`, validationErrors);
+
+    if (Object.keys(validationErrors).length) {
+      return res.status(400).json({ message: 'Bad Request', errors: validationErrors });
+    }
+
+    console.log(`\n==== GOT HERE =====\n`);
+
+    const queryOptions = {
         include: [
-            {
-                model: Review,
-                as: 'Reviews',
-            },
-            {
-                model: SpotImage,
-                as: 'SpotImages'
-            },
-        ]
-    }); 
-    const spotDeets = allSpots.map ( spot => {
+          {
+            model: Review,
+            as: 'Reviews',
+            attributes: [],
+          },
+          {
+            model: SpotImage,
+            as: 'SpotImages',
+            attributes: [], 
+          }
+        ],
+        limit: req.query.size || 20, // defaulted to 20
+        offset: (req.query.page || 1 - 1) * (req.query.size || 20),
+        where: {}, 
+      };
+  
+      if (req.query.minLat) {
+        queryOptions.where.lat = {
+          [Op.gte]: req.query.minLat
+        };
+      }
+      if (req.query.maxLat) {
+        queryOptions.where.lat = {
+          ...queryOptions.where.lat,
+          [Op.lte]: req.query.maxLat
+        };
+      }
+      if (req.query.minLng) {
+        queryOptions.where.lng = {
+          [Op.gte]: req.query.minLng
+        };
+      }
+      if (req.query.maxLng) {
+        queryOptions.where.lng = {
+          ...queryOptions.where.lng,
+          [Op.lte]: req.query.maxLng
+        };
+      }
+      if (req.query.minPrice) {
+        queryOptions.where.price = {
+          [Op.gte]: req.query.minPrice
+        };
+      }
+      if (req.query.maxPrice) {
+        queryOptions.where.price = {
+          ...queryOptions.where.price,
+          [Op.lte]: req.query.maxPrice
+        };
+    }
+
+    const allSpots = await Spot.findAll(queryOptions); 
+
+    const spotDeets =  await Promise.all(allSpots.map(spot => {
         const avgRating = calcAvg(spot.Reviews);
-
         const previewImg = getPreviewImg(spot.SpotImages);
-
         return {
             id: spot.id,
             ownerId: spot.ownerId,
@@ -70,12 +235,17 @@ router.get('/', async (req, res) => {
             updatedAt: spot.updatedAt,
             avgRating: avgRating,
             previewImage: previewImg
-        };
-    });
+        }
+    })); 
 
-    return res.status(200).json({ Spots: spotDeets });
-});  
+    return res.status(200).json({ Spots: spotDeets, page: req.query.page || 1, size: req.query.size || 20 });
+// } catch (error) {
+//     console.error(error);
+//     return res.status(400).json({ message: 'Bad Request' });
+// }
+}); 
 
+// ^====================================================
 router.get('/current', restoreUser, requireAuth, async (req, res) => {
     const currentUserId = req.user.id;
 
@@ -407,29 +577,95 @@ router.post('/:spotId/reviews', restoreUser, requireAuth, async (req, res) => {
 
 router.get('/:spotId/bookings', restoreUser, requireAuth, async (req,res) => {
     const { spotId } = req.params;
-    const { userId } = req.user.id
+    const userId = req.user.id;
+
     const spotExists = await Spot.findByPk(spotId);
 
-    if (spotId === userId)
+    console.log(userId);
+
+    // if (spotId === userId)
 
     if (!spotExists) {
         return res.status(404).json({message: "Spot couldn't be found"})
-    };
+    }
+
+    // const booking = await Booking.findAll({
+    //     where: { spotId },
+    //     include: userId === spotExists.ownerId ? [{ model: User, attributes: ['id', 'firstName', 'lastName']}] : []
+    // });
+
     const booking = await Booking.findAll({
-        where: { spotId },
-        include: userId === spotExists.ownerId ? [{moserl :User, attributes: ['id', 'firstName', 'lastName']}] : []
+        where: {
+            spotId: spotId,
+        },
+        include: [
+            {
+                model: User,
+                where: {
+                    id: userId
+                },
+                attributes: ['id', 'firstName', 'lastName'],
+            }
+        ]
     });
+
+    console.log(`\n ===BOOKING=== \n`, booking);
+
     if (userId === spotExists.ownerId) {
-        return res.status(200).json({Bookings: booking});
+        // const currUser = await User.findOne({
+        //     where: {
+        //         id: spotExists.ownerId,
+        //     },
+        //     attributes: ['id', 'firstName', 'lastName'],
+        // })
+        // console.log(`\n === USER ===\n`, currUser);
+        // booking.User = currUser;
+        return res.status(200).json({ 
+            Bookings: booking,
+            // ...currUser
+        });
     } else { 
         const filteredBookings = booking.map(booking => ({
             spotId: booking.spotId,
             startDate: booking.startDate,
             endDate: booking.endDate
         }));
-        return res.status(200).json({Bookings: filteredBookings })
+        return res.status(200).json({ Bookings: filteredBookings })
     }
 });
+
+// router.get('/:spotId/bookings', requireAuth, async (req,res) => {
+//     try{
+//     const { spotId } = req.params;
+//     const { userId } = req.user;
+//     const spotExists = await Spot.findByPk(spotId);
+
+//     // if (spotId === userId) {
+
+//     // }
+
+//     if (!spotExists) {
+//         return res.status(404).json({message: "Spot couldn't be found"})
+//     };
+//     const booking = await Booking.findAll({
+//         where: { spotId },
+//         include: userId === spotExists.ownerId ? [{model: User, attributes: ['id', 'firstName', 'lastName']}] : []
+//     });
+//     if (userId === spotExists.ownerId) {
+//         return res.status(200).json({Bookings: booking});
+//     } else { 
+//         const filteredBookings = booking.map(booking => ({
+//             spotId: booking.spotId,
+//             startDate: booking.startDate,
+//             endDate: booking.endDate
+//         }));
+//         return res.status(200).json({Bookings: filteredBookings })
+//     }
+// }catch (e) {
+//     console.error("Error in route:", e);
+//     return res.status(500).json({message: "internal sever error"})
+// }
+// });
 
 
 module.exports = router;
