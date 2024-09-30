@@ -89,7 +89,7 @@ function getPreviewImg(images) {
 router.get('/', async (req, res) => {
 // try {
     const validationErrors = {};
-    console.log(`\n=== REQ.QUERY ===\n`, req.query);
+    // console.log(`\n=== REQ.QUERY ===\n`, req.query);
 
 
     // validate page/size
@@ -154,13 +154,13 @@ router.get('/', async (req, res) => {
       validationErrors.maxPrice = 'Maximum price must be greater than or equal to 0';
     }
 
-    console.log(`\n==== Errors ====\n`, validationErrors);
+    // console.log(`\n==== Errors ====\n`, validationErrors);
 
     if (Object.keys(validationErrors).length) {
       return res.status(400).json({ message: 'Bad Request', errors: validationErrors });
     }
 
-    console.log(`\n==== GOT HERE =====\n`);
+    // console.log(`\n==== GOT HERE =====\n`);
 
     const queryOptions = {
         include: [
